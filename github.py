@@ -23,6 +23,8 @@ class Github:
         if open_browser:
             for an in an_o_goh:
                 webbrowser.open(an)
+        else:
+            print(an_o_goh)
 
     def get_users(self, set, tab):
         i = 1
