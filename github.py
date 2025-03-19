@@ -4,20 +4,21 @@ import webbrowser
 
 
 class Github:
-
-    def __init__(self, username):
-        self.username = username
+    def __init__(self, username: str):
         self.base_url = f"https://github.com/{username}"
-        self.followers = set()
-        self.following = set()
 
-    def get_not_following_back(self, open_browser=True):
-        self.get_followers()
-        self.get_following()
+    def get_not_following_back(self, open_browser: bool = True):
+        """
+        Finds users that are not following back. Afterward, if `open_browser`
+        is true, it will open a browser tab with the GitHub profile of those
+        users, otherwise, it will print their usernames.
+        """
+        followers = self.get_users("followers")
+        followings = self.get_users("following")
 
         an_o_goh = []
-        for following in self.following:
-            if following not in self.followers:
+        for following in followings:
+            if following not in followers:
                 an_o_goh.append(f"https://github.com/{following}")
 
         if open_browser:
@@ -26,27 +27,28 @@ class Github:
         else:
             print(an_o_goh)
 
-    def get_users(self, set, tab):
-        i = 1
+    def get_users(self, tab: str):
+        """
+        Returns a set of usernames of the users from the given `tab` of the
+        GitHub profile specified by `self.base_url`.
+        """
+        users = set()
+        page = 1
         while True:
-            url = f"{self.base_url}?page={i}&tab={tab}"
-            users = BeautifulSoup(requests.get(url).text, "lxml").findAll("a", {"data-hovercard-type": "user"})
-            if len(users) == 0:  # No More Pages of Following/Followers
+            # Loop through all the available pages
+            url = f"{self.base_url}?page={page}&tab={tab}"
+            page_users = BeautifulSoup(requests.get(url).text, "lxml").findAll(
+                "a", {"data-hovercard-type": "user"}
+            )
+            if len(page_users) == 0:
+                # No more pages are available for this tab
                 break
-            for user in users:
+            for user in page_users:
                 if len(user["class"]) == 3:
-                    set.add(user["href"][1:])
-            i += 1
+                    users.add(user["href"][1:])
+            page += 1
+        return users
 
-    def get_followers(self):
-        if len(self.followers) > 0:
-            return
-        self.get_users(self.followers, "followers")
-
-    def get_following(self):
-        if len(self.following) > 0:
-            return
-        self.get_users(self.following, "following")
 
 if __name__ == "__main__":
     Github(username="arianhaddadi").get_not_following_back(open_browser=True)
