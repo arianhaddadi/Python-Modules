@@ -1,13 +1,14 @@
 from bs4 import BeautifulSoup
 import requests
 import webbrowser
+from typing import Set
 
 
 class Github:
-    def __init__(self, username: str):
+    def __init__(self, username: str) -> None:
         self.base_url = f"https://github.com/{username}"
 
-    def get_not_following_back(self, open_browser: bool = True):
+    def get_not_following_back(self, open_browser: bool = True) -> None:
         """
         Finds users that are not following back. Afterward, if `open_browser`
         is true, it will open a browser tab with the GitHub profile of those
@@ -27,7 +28,7 @@ class Github:
         else:
             print(an_o_goh)
 
-    def get_users(self, tab: str):
+    def get_users(self, tab: str) -> Set[str]:
         """
         Returns a set of usernames of the users from the given `tab` of the
         GitHub profile specified by `self.base_url`.
